@@ -1,0 +1,121 @@
+<section data-background="#6CE2FF">
+
+  <section>
+    <h2 class="alt">How We Got Here</h2>
+
+    <aside class="notes">
+      <p>Brief history of JS: Eich, 1995, 2 weeks, eventual
+      standardization, years of stagnation
+      <p>Rise of AJAX: Gmail, Google Maps; later Twitter, Facebook
+      <p>Improved Browser performance
+      <p>Widespread Adoption of JavaScript; Client-side templating
+    </aside>
+  </section>
+
+  <section>
+    <h3>Backbone has 2 Dependencies:</h3>
+    <h3>jQuery &amp; Underscore</h3>
+    <p class="fragment" style="margin-top: 1em"><b>$</b> and <b>_</b></p>
+    <p class="fragment" style="margin-top: 1em">Easy, right?</p>
+    <aside class="notes">
+      <p>In order to understand Backbone, it's important to understand
+        what it *doesn't* do; knowing what it borrows from it's
+        dependencies
+    </aside>
+  </section>
+
+  <section>
+    <h2>jQuery</h2>
+    <pre class="fragment"><code data-trim class="language-javascript">
+$(document).ready(function(){
+
+  // Attach a click event handler
+  $('.my-thing').click(function(){
+
+    // Send a message to the server
+    $.post('/do-stuff', {
+      message: "hello world"
+    }, function(response){
+
+      // Render the response on the page
+      $('.my-thing').html(response);
+    });
+
+  });
+
+});
+    </code></pre>
+  </section>
+
+  <section>
+    <blockquote class="alt">"The DOM is a mess" <br/> - John Resig</blockquote>
+
+    <aside class="notes">
+      <p>Long method names, confusing/unpredictable arities and terrible performance
+      <p>and it was JavaScript's primary interface to its environment.
+    </aside>
+  </section>
+
+  <section>
+    <h3>jQuery is a DOM Library</h3>
+    <p class=fragment>and not a tool for organizing and managing
+      applications</p>
+  </section>
+  <section>
+    <h2>jQuery</h2>
+    <small><a href="http://jquery.com">http://jquery.com</a></small>
+    <p class="fragment" style="margin-top: 1em">Emerged in 2006 as a simple selector engine with a chainable syntax</p>
+    <p class="fragment" style="margin-top: 1em">Competition with other frameworks over performance propelled jQuery to be (at present) the most used JavaScript library on the web.</p>
+    <p class="fragment" style="margin-top: 1em">When it doubt, <a href="http://api.jquery.com/" target=_blank>http://api.jquery.com/</a> is your best friend</p>
+  </section>
+  <section>
+    <h2>Underscore</h2>
+    <small><a href="http://underscorejs.org/" target=_blank>http://underscorejs.org/</a></small>
+    <p class="fragment" style="margin-top: 1em"><q>The tie on jQuery's tux</q></p>
+    <p class="fragment" style="margin-top: 1em">A lightweight set of utility functions, that rely on ECMAScript 5 native methods</p>
+    <p class="fragment" style="margin-top: 1em">Backbone Models and Collections "borrow" many underscore methods</p>
+    <p class="fragment" style="margin-top: 1em">No longer a hard dependecy: <a href="https://github.com/bestiejs/lodash" target=_blank>Lodash</a> is a performance-minded alternate implementation of the Underscore API.</p>
+    <aside class="notes">
+      <p>If you've ever used Ruby or Prototype.js, you're already familiar with a majority of these methods.</p>
+    </aside>
+  </section>
+
+  <section>
+    <h2 class=alt>Single Page Applications</h2>
+
+    <aside class="notes">
+      <p>Shout-out to Prototype.js and Dojo Toolkit and Google Web
+      Toolkit
+      <p>SPA's have become the default standard: RDIO, Twitter, Facebook, Airbnb
+      <p>Fast user experiences
+      <p>Backbone seeks to remove state from the DOM
+    </aside>
+  </section>
+
+  <section>
+    <pre><code data-trim class="language-javascript">
+$(document).ready(function(){
+
+  // Attach a click event handler
+  $('.my-thing').click(function(){
+
+    // Send a message to the server
+    $.post('/do-stuff', {
+      message: "hello world"
+    }, function(response){
+
+      // Render the response on the page
+      $('.my-thing').html(response);
+    });
+
+  });
+
+});
+    </code></pre>
+    <aside class="notes">
+      <p>jQuery, because it's DOM-centric, encourages you to tie
+        application directly to the HTML document you're working with
+    </aside>
+  </section>
+
+</section>

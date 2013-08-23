@@ -1,0 +1,265 @@
+<section data-background="orange">
+
+  <section>
+    <h2 class="alt">Models</h2>
+  </section>
+
+  <section>
+    <p>Represent a single resource returned from a server</p>
+    <p class="fragment">Can be used for storing data in-memory</p>
+    <p class="fragment">Conversions, Validations, Computed Properties,
+      Access Control</p>
+  </section>
+
+  <section>
+    <p>Internal data storage with Getter/Setter methods</p>
+    <p class="fragment">Built-in events system that broadcasts lifecycle
+      changes</p>
+  </section>
+
+  <section>
+    <h3 class="alt">Making models flexible</h3>
+      <p class=fragment><code data-trim>.parse()</code></p>
+      <p class=fragment><code data-trim>.toJSON()</code></p>
+      <p class=fragment><code data-trim>.sync()</code></p>
+  </section>
+
+  <section>
+    <pre><code class="language-javascript" data-trim>
+{
+  "book": {
+    "title": "The Long Goodbye",
+    "author": "Raymond Chandler"
+  }
+}
+    </code></pre>
+    <div class="fragment">
+      <pre><code class="language-javascript" data-trim>
+var BookModel = Backbone.Model.extend({
+  parse: function(attrs){
+    return attrs.book
+  }
+});
+    </code></pre>
+    </div>
+    <div class="fragment">
+      <pre><code class="language-javascript" data-trim>
+book.fetch();
+book.get('author');
+// => "Raymond Chandler"
+      </code></pre>
+  </div>
+  </section>
+
+  <section>
+    <pre><code class="language-javascript" data-trim>
+{
+  "content": "Lorem ipsum....",
+  "author": {
+    "email": "sam@quickleft.com",
+    "username": "wookiehangover",
+    "avatar": "someimage.jpg"
+  }
+}
+    </code></pre>
+    <div class="fragment">
+      <pre><code class="language-javascript" data-trim>
+var CommentModel = Backbone.Model.extend({
+  constructor: function(){
+    this.author = new UserModel();
+  },
+  parse: function(attrs){
+    if( attrs.author ){
+      this.author.set(attrs.author)
+    }
+    return _.omit(attrs, 'author');
+  }
+});
+    </code></pre>
+    </div>
+    <div class="fragment">
+      <pre><code class="language-javascript" data-trim>
+comment.toJSON();
+// =>
+// {
+//  "content": "Lorem ipsum..."
+// }
+      </code></pre>
+  </div>
+  </section>
+
+  <section>
+    <pre><code class="language-javascript" data-trim>
+var CommentModel = Backbone.Model.extend({
+  ...
+  toJSON: function(options){
+    var json = Backbone.Model.prototype.toJSON.call(this);
+    if( options && options.author ){
+      json.author = this.author.toJSON();
+    }
+    return json;
+  }
+});
+    </code></pre>
+    <div class="fragment">
+      <pre><code class="language-javascript" data-trim>
+comment.toJSON({ author: true });
+// =>
+// {
+//  "content": "Lorem ipsum...",
+//  "author": {
+//    "email": "sam@quickleft.com",
+//    "username": "wookiehangover",
+//    "avatar": "someimage.jpg"
+//  }
+// }
+      </code></pre>
+  </div>
+  </section>
+
+   <section>
+    <h3>Backbone Models</h3>
+    <h5 class="fragment">Organizes an object's attributes.</h5>
+    <h5 class="fragment">Define a model:</h5>
+    <pre class="fragment"><code data-trim>
+var Song = Backbone.Model.extend({
+  initialize: function() {
+    console.log("You've initialized a Song model!");
+  }
+});
+
+var songModel = new Song(); // "You've initialized a Song model!"
+    </code></pre>
+
+    <h5 class="fragment">Use that model:</h5>
+    <pre class="fragment"><code data-trim>
+var songModel = new Song({
+  artist: "Death Cab for Cutie",
+  title: "Codes & Keys"
+});
+
+songModel.get('artist'); // "Death Cab for Cutie"
+    </code></pre>
+  </section>
+  <section>
+    <h3>Backbone Models</h3>
+    <h5 class="fragment">Accessing model attributes</h5>
+    <pre class="fragment"><code data-trim>
+.get('attribute_name')
+    </code></pre>
+    <pre class="fragment"><code data-trim>
+songModel.attributes.artist; // equivalent to songModel.get('artist');
+    </code></pre>
+    <pre class="fragment"><code data-trim>
+songModel.toJSON();
+// =>
+//  {
+//    artist: "Death  Cab for Cutie",
+//    title: "Codes & Keys"
+//  }
+    </code></pre>
+  </section>
+  <section>
+    <h3>Backbone Models</h3>
+    <h5 class="fragment">Setting model attributes</h5>
+    <pre class="fragment"><code data-trim>
+        songModel.set({artist: "Ben Gibbard"});
+      </code></pre>
+    <h5 class="fragment">Default values</h5>
+    <pre class="fragment"><code data-trim>
+var Song = Backbone.Model.extend({
+  defaults: {
+    title: "Codes & Keys",
+    artist: "Death Cab for Cutie"
+  }
+});
+
+// will do the same thing as:
+
+var Song = Backbone.Model.extend({
+  initialize: function() {
+    this.set({
+      title: "Codes & Keys",
+      artist: "Death Cab for Cutie"
+    })
+  }
+})
+    </code></pre>
+  </section>
+  <section>
+    <h3>Backbone Models</h3>
+    <h5 class="fragment">Listening for changes</h5>
+    <pre class="fragment"><code data-trim>
+var Song = Backbone.Model.extend({
+  initialize: function() {
+    this.on("change", function() {
+      // call methods when any attribute changes
+    });
+
+    this.on("change:artist", function() {
+      // call methods when the artist attribute changes
+    });
+  }
+})
+    </code></pre>
+  </section>
+  <section>
+    <h3>Backbone Models</h3>
+    <h5 class="fragment">Persisting models</h5>
+    <h5 class="fragment">Save model changes to the server by calling .save() on a model instance.</h5>
+    <pre class="fragment"><code data-trim>
+var songModel = new Song({
+  artist: "Death Cab for Cutie",
+  title: "Codes & Keys"
+});
+
+songModel.save(); // Push this data to the server
+songModel.fetch(); // Overwrite this instance with newer data from the server
+songModel.destroy(); // Destroy the model on the server (sends a DELETE request)
+    </code></pre>
+  </section>
+
+
+</section>
+
+<section>
+  <section>
+    <h3>Using RESTful APIs</h3>
+    <h5 class="fragment">REST</h5>
+    <ul>
+      <li class="fragment">
+        A way to architect data and the traffic that acts on that data. 
+      </li>
+      <li class="fragment">
+        Communicates what resource you are trying to access and what you want to do with that resource, through a URL.
+      </li>
+      <li class="fragment">
+        Components of a request: type and resource
+      </li>
+    </ul>
+  </section>
+  <section>
+    <h3>REST</h3>
+    <p class="fragment">Example:</p>
+    <pre class="fragment"><code data-trim>
+GET /users
+    </code></pre>
+    <p class="fragment">Requesting data (not creating data) about the system's users.</p>
+
+    <pre class="fragment"><code data-trim>
+GET /users/1
+    </code></pre>
+    <p class="fragment">Requesting data about the user with the ID of 1.</p>
+  </section>
+  <section>
+    <h3>REST</h3>
+    <h4>Different request types</h4>
+    <pre class="fragment"><code data-trim>
+POST /users/1, data: { first_name: "Donald" }
+    </code></pre>
+    <p class="fragment">Think of the request type as the verb, and the resource as the subject.</p>
+  </section>
+
+</section>
+
+

@@ -1,0 +1,251 @@
+<section>
+  <section>
+    <h3 class="alt">Backbone Views and client side templating</h3>
+    <h5>A Backbone view is:</h5>
+    <ul>
+      <li class="fragment">
+        An object that manages the presentation of a model
+      </li>
+      <li class="fragment">
+        NOT just the HTML that gets rendered to the DOM.
+      </li>
+      <li class="fragment">
+        Manages events for its markup.
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h3 class="alt">Backbone Views</h3>
+    <h5 class="fragment">Define a view</h5>
+    <pre class="fragment"><code data-trim>
+var SongView = Backbone.View.extend({
+  render: function() {
+    var template = _.template($('#song_template').html()),
+        markup = template(this.model.toJSON());
+
+    this.$el.html(markup).appendTo('#songs');
+  }
+});
+
+var song = new Song({artist: "Death Cab for Cutie", song: "Codes & Keys"});
+song.view = new songView({model: song});
+song.view.render();
+    </code></pre>
+  </section>
+  <section>
+    <h3 class="alt">Backbone Views</h3>
+    <h5 class="fragment">Templating</h5>
+    <ul>
+      <li class="fragment"><strong>Template:</strong> an HTML fragment that accepts a JavaScript object to fill in its missing data pieces</li>
+    </ul>
+    <pre class="fragment"><code data-trim>
+&lt;script type="html/template" id="song_template"&gt;
+  &lt;li class="song">
+    Title: <%= title %>
+    Artist: <%= artist %>
+  &lt;/li>
+&lt;/script&gt;
+    </code></pre>
+
+    <pre class="fragment"><code data-trim>
+var template = _.template($('#song_template').html());
+var song_object = {
+  title: "Codes & Keys",
+  artist: "Death Cab for Cutie"
+}
+var markup = template(song_object);
+    </code></pre>
+  </section>
+
+  <section>
+    <h3 class="alt">Backbone Views</h3>
+    <h5 class="fragment">Why use templates?</h5>
+    <pre class="fragment"><code data-trim>
+// warning: anti-pattern
+var li = "&lt;li class='song'>";
+li += "Title: Codes & Keys";
+li += "Artist: Death Cab for Cutie";
+li += "&lt;/li>"
+    </code></pre>
+
+    <pre class="fragment"><code data-trim>
+&lt;script type="html/template" id="song_template"&gt;
+  &lt;li class="song">
+    Title: <%= title %>
+    Artist: <%= artist %>
+  &lt;/li>
+&lt;/script&gt;
+    </code></pre>
+  </section>
+
+  <section>
+    <h3 class="alt">Backbone Views</h3>
+    <h5 class="fragment">Rendering</h5>
+    <pre class="fragment"><code data-trim>
+var SongView = Backbone.View.extend({
+  render: function() {
+    var template = _.template($('#song_template').html()),
+        markup = template(this.model.toJSON());
+
+    this.$el.html(markup).appendTo('#songs');
+  }
+});
+
+var song = new Song({artist: "Death Cab for Cutie", song: "Codes & Keys"});
+song.view = new songView({model: song});
+song.view.render();
+    </code></pre>
+  </section>
+
+  <section>
+    <h3 class="alt">Backbone Views</h3>
+    <h5 class="fragment">Rendering</h5>
+    <ul>
+      <li class="fragment">
+        A view has an associated HTML element at all times.
+      </li>
+      <li class="fragment">
+        Change the properties of that view by adding key/values to your view class. 
+      </li>
+    </ul>
+    <pre class="fragment"><code data-trim>
+var SongView = Backbone.View.extend({
+  tagName: 'li',
+  className: 'song',
+  render: function() {}
+});
+    </code></pre>
+    <h5 class="fragment">Or use an element that's already there</h5>
+    <pre class="fragment"><code data-trim>
+var SongView = Backbone.View.extend({
+  el: $('#song_container'),
+  render: function() {}
+});
+    </code></pre>
+  </section>
+
+  <section>
+    <h3 class="alt">Backbone Views</h3>
+    <h5 class="fragment">DOM Events</h5>
+    <pre class="fragment"><code data-trim>
+var SongView = Backbone.View.extend({
+  events: {
+    'click li': 'playSong',
+    'submit #myForm': 'handleSubmit'
+  },
+  render: function() {},
+  playSong: function(e) {
+    // handle the click event on an &lt;li> inside our view
+  },
+  handleSubmit: function(e) {
+    // handle the form submit event in an element with an ID of "myForm"
+  }
+});
+    </code></pre>
+  </section>
+
+  <section>
+    <h3 class="alt">Memory Management with Views</h3>
+    <ul>
+      <li class="fragment">GC is usually something you don't have to think about</li>
+      <li class="fragment">Views can be destroyed by calling <code>remove</code></li>
+      <li class="fragment">If views have references to long-lived objects, they
+        will remain in memory even after they are removed</li>
+    </ul>
+  </section>
+
+  <section>
+    <pre ><code data-trim class="language-javascript">
+var SongView = Backbone.View.extend({
+  initialize: function(options){
+    this.model.on('change', this.render, this);
+  }
+});
+
+song.remove(); // Not garbage collected because of event binding
+    </code></pre>
+    <aside class="notes">
+      <p>In small apps with only a few views, this won't matter much
+      <p>But it will in large apps that do this 100s of times
+    </aside>
+  </section>
+
+  <section>
+    <pre ><code data-trim class="language-javascript">
+var SongView = Backbone.View.extend({
+  initialize: function(options){
+    this.listenTo(this.model, 'change', this.render, this);
+  }
+});
+
+song.remove(); // .stopListening() is called from .remove(), GC takes place
+    </code></pre>
+  </section>
+
+  <section>
+    <h3 class="alt">Responsible Rendering</h3>
+    <aside class="notes">
+      <p>The last thing to discuss is how to implement your render
+      methods
+      <p>Granularity in rendering makes responding to changing needs in
+      your application over time easier
+      <p>Views are cheap to create; nesting views is totally acceptable
+    </aside>
+  </section>
+
+  <section>
+    <h3 class="alt">Single Responsibility Priciple</h3>
+    <h3 class="alt fragment">Interface Segregation</h3>
+  </section>
+
+  <section>
+    <pre ><code data-trim class="language-javascript">
+render: function(){
+  this.renderCommentCount();
+  this.renderContent();
+  this.renderEditor();
+}
+    </code></pre>
+  </section>
+
+  <section>
+    <h3 class="alt">Organizing applications around a view</h3>
+  </section>
+
+  <section>
+    <pre ><code data-trim class="language-javascript">
+var Comments = Backbone.View.extend({
+
+  el: $('.comments'),
+
+  initialize: function(){
+    this.collection = new CommentsCollection();
+    this.listenTo( this.collection, 'add', this.renderComment );
+    this.listenTo( this.collection, 'add remove', this.renderCommentCount );
+    this.collection.fetch();
+  },
+
+  renderComment: function(model){ ... },
+
+  renderCommentCount: function(){ ... },
+
+  events: {
+    'submit form': 'createComment',
+    'click .logout': 'logout'
+  },
+
+  createComment: function(event){ ... },
+
+  logout: function(){ ... }
+});
+    </code></pre>
+  </section>
+
+  <section>
+    <h3 class="alt">Break for Questions</h3>
+  </section>
+
+</section>
+
+

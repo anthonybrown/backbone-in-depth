@@ -1,0 +1,9 @@
+{
+  "name": "Backbone In Depth",
+  "version": "0.0.1",
+  "dependencies": {
+    "reveal.js": "~2.5",
+    "handlebars": "~1.0.0",
+    "jquery": "~1.10"
+  }
+}

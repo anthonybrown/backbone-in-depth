@@ -1,0 +1,131 @@
+<section>
+  <section>
+    <h2 class="alt">Backbone Routing</h2>
+  </section>
+  <section>
+    <h3 class="alt">HTTP = full load</h3>
+    <p>In a typical web app, routes correspond to HTTP requests / full page loads.</p>
+  </section>
+  <section>
+    <h3 class="alt">Payload</h3>
+    <p>In client side applications, it's best to download all code upfront.</p>
+  </section>
+  <section>
+    <h3 class="alt">Single Page App</h3>
+    <p>In the past this has been done as a single page app.</p>
+  </section>
+  <section>
+    <h3 class="alt">Hash Fragment</h3>
+    <pre><code data-trim>
+        twitter.com/status#!/2305293
+    </code></pre>
+  </section>
+  <section>
+    <h3 class="alt">Progression of Client side routing</h3>
+    <ul>
+      <li>Controversy</li>
+      <li>Hack</li>
+      <li>Client gaining more responsibility</li>
+      <li>Realization of speed and user flow improvement</li>
+      <li>More work went into routing &gt; HTML5 History API</li>
+    </ul>
+  </section>
+  <section>
+    <h3 class="alt">HTML5 History API</h3>
+    <p>push / pop history state</p>
+  </section>
+  <section>
+    <h3 class="alt">Backbone supports both!</h3>
+    <p>But first a bit on the Backbone.Router:</p>
+  </section>
+  <section>
+    <pre><code data-trim>
+var Router = Backbone.Router.extend({
+
+  routes: {
+    "songs":     "showSongs",
+    "songs/:id": "showSong",
+    "*args":     "index"
+  },
+
+  showSongs: function() {
+    // initialize songs index view
+  },
+
+  showSong: function() {
+    // initialize song show view
+  },
+
+  index: function(args) {
+    // show index
+  }
+
+});
+    </code></pre>
+  </section>
+  <section>
+    <h3 class="alt">.navigate</h3>
+    <p>Call navigate(fragment, [options]) to change the route.</p>
+    <ul>
+      <li>{ trigger: true } - call routing method</li>
+      <li>{ replace: true } - do not create history entry</li>
+    </ul>
+  </section>
+  <section>
+    <h3 class="alt">Backbone.history.start</h3>
+    <p>Call Backbone.history.start([options]) when all routes have been defined.</p>
+    <ul>
+      <li>Defaults to hashchange routing events</li>
+      <li>{ pushState: true } - use pushState routing</li>
+      <li>{ replace: true } - do not create history entry</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3 class="alt">Routes should be repeatable</h3>
+  </section>
+
+  <section>
+    <pre><code data-trim class="language-javascript">
+module.exports = Backbone.Router.extend({
+
+  initialize: function(options) {
+    if(!options.app) {
+      throw new Error('You must provide an app instance');
+    }
+    this.app = options.app;
+  },
+
+  routes: {
+    '': 'showLoggedout',
+    'logout': 'logoutUser',
+    'login': 'showLogin',
+    'auth/:service': 'authenticate',
+    'dashboard': 'showDashboard'
+  },
+
+  showLogin: function() {
+    this.app.views.header.signIn.render();
+  },
+
+  authenticate: function(service) {
+    if(service === 'identity') {
+      this.app.views.header.createAccount.render();
+      return;
+    }
+
+    this.app.user.authenticate(service, this.app);
+  },
+
+  logoutUser: function() {
+    this.app.user.logout();
+  },
+
+  showDashboard: function() {
+    this.app.views.dashboard.render();
+  }
+});
+    </code></pre>
+  </section>
+
+</section>
