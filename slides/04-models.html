@@ -67,6 +67,7 @@ book.get('author');
 var CommentModel = Backbone.Model.extend({
   constructor: function(){
     this.author = new UserModel();
+    Backbone.Model.apply(this, arguments);
   },
   parse: function(attrs){
     if( attrs.author ){

@@ -1,6 +1,6 @@
 <section>
   <section>
-    <h3 class="alt">Philosophy, usage, and convention</h3>
+    <h3 class="alt">Backbone Core</h3>
     <blockquote class="fragment">"There's more than one way to do it."</blockquote>
     <p class="fragment" style="margin-top: 1em;">Backbone attempts to remain agnostic, leaving many of the patterns up to the implementors to figure out.</p>
   </section>
@@ -51,13 +51,15 @@ $('.show-comments').on('click', function( event ){
     </ul>
     <h3 class="fragment" style="margin-top: 1em">Turns out this is all avoidable.</h3>
   </section>
+
   <section>
     <h2>Backbone helps fix this.</h2>
     <ul>
       <li class="fragment"><b>Models &amp; Collections</b>: Separate interfaces for managing data on the client side.</li>
       <li class="fragment"><b>Custom Events</b>: An easy way to deal with changing data in your app.</li>
+      <li class="fragment"><b>Views</b>: Encapsulate DOM elements with custom behavior, independent rendering</li>
+      <li class="fragment"><b>Router</b>: Manage application state with URLs</li>
       <li class="fragment"><b>Sync</b>: Single point of entry for all AJAX requests.</li>
-      <li class="fragment"><b>Views</b>: Event Delegation for free.</li>
       <li class="fragment"><b>Developer Ergonomics</b>: Code that's easier to test.</li>
     </ul>
   </section>
@@ -207,52 +209,6 @@ comment.set({ content: 'Hello World' });
 
   </section>
 
-
-</section>
-
-
-<section>
-
-  <section>
-    <h3>Project Setup</h3>
-
-    <p><a href="http://jsbin.com/umOb/2/edit?js,html" target="_blank">http://jsbin.com/umOb/2/edit</a></p>
-
-    <p>or</p>
-
-    <pre><code data-trim>
-git clone git@github.com:quickleft/backbone-comments.git
-cd backbone-comments
-    </code></pre>
-  </section>
-
-  <section>
-    <h2 class="alt">Ex1: Backbone Comments</h2>
-    <p>Goal: accept form input to create comments</p>
-  </section>
-
-  <section>
-    <h2 class="alt">Live Coding / Walkthrough</h2>
-  </section>
-
-  <section>
-    <pre><code data-trim>
-git clone git@github.com:quickleft/backbone-comments.git
-cd backbone-comments
-git checkout -b project-template origin/project-template
-    </code></pre>
-  </section>
-  </section>
-
-  <section>
-    <h3 class="alt">Time for some opinions:</h3>
-
-    <ul>
-      <li>Require.js for modules</li>
-      <li>Bower for dependency management</li>
-      <li>Grunt.js for building for production</li>
-    </ul>
-  </section>
 
 </section>
 
