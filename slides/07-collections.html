@@ -10,53 +10,56 @@
   <section>
     <h3 class="alt">Extending Backbone.Collection:</h3>
     <pre><code data-trim class="javascript">
-var Library = Backbone.Collection.extend({
-  model: Song
+var CommentsCollection = Backbone.Collection.extend({
+  model: CommentModel
 });
 
-var songCollection = new Library([
+var comments = new CommentsCollection([
   {
-    artist: "Death Cab for Cutie",
-    title: "Codes & Keys"
+    content: "Hello World",
+    email: "sam@quickleft.com"
   },
   {
-    artist: "Noisettes",
-    title: "Atticus"
+    content: "Lorem ipsum dvorak...",
+    email: "john@quickleft.com"
   }
 ]);
 
-songCollection.models.length; // 2
-
-songCollection.first().get('artist'); // "Death Cab for Cutie"
+comments.length; // 2
+comments.first().get('email'); // "sam@quickleft.com"
     </code></pre>
   </section>
 
   <section>
     <h3 class="alt">Other ways to add models:</h3>
     <pre><code data-trim class="javascript">
-songCollection.add({
-  artist: "Noisettes",
-  title: "Cheap Kicks"
+comments.add({
+  content: "Hello World",
+  email: "sam@quickleft.com"
 });
     </code></pre>
 
     <pre class="fragment"><code data-trim class="javascript">
-songCollection.create({
-  artist: "The Damned",
-  title: "Jet Boy Jet Girl"
+comments.create({
+  content: "Lorem ipsum dvorak...",
+  email: "john@quickleft.com"
 });
     </code></pre>
+
+    <aside class="notes">
+      <p>Collection.create saves the model on the server
+    </aside>
   </section>
 
   <section>
     <h3 class="alt">Polymorphic Models</h3>
     <pre><code data-trim class="language-javascript">
 Backbone.Collection.extend({
-  model: function(){
+  model: function(attrs, options){
     if( condition ){
-      return BookModel;
+      return new FacebookUser(attrs, options);
     } else {
-      return NovellaModel;
+      return new UserModel(attrs, options);
     }
   }
 });
@@ -65,13 +68,51 @@ Backbone.Collection.extend({
       <p>Collections can be composed of my different types of models
     </aside>
   </section>
+
+
+  <section>
+    <h3 class="alt">set(models, [options])</h3>
+    <pre><code data-trim class="language-javascript">
+var vanHalen = new Collection([eddie, alex, stone, roth]);
+
+vanHalen.set([eddie, alex, stone, hagar]);
+
+// Fires a "remove" event for roth, and an "add" event for "hagar".
+// Updates any of stone, alex, and eddie's attributes that may have
+// changed over the years.
+    </code></pre>
+  </section>
+
+
+  <section>
+    <h3 class="alt">comparator / sort</h3>
+    <pre><code data-trim class="language-javascript">
+comparator: function(comment){
+  return comment.get('created_at');
+}
+
+comments.add([
+  {
+    content: 'Second Comment'
+    created_at: 1000000000001
+  },
+  {
+    content: 'First Comment'
+    created_at: 1000000000000
+  }
+]);
+
+comments.first().get('content'); // "First Comment"
+    </code></pre>
+  </section>
+
   <section>
     <h3 class="alt">remove()</h3>
     <!-- The remove method... -->
     <pre class="fragment"><code data-trim class="javascript">
-var lowBitrateSongs = songCollection.where({quality: "poor"});
+var userComments = comments.where({ email: "sam@quickleft.com" });
 
-songCollection.remove(lowBitrateSongs)
+comments.remove(userComments)
     </code></pre>
   </section>
 
@@ -80,10 +121,11 @@ songCollection.remove(lowBitrateSongs)
     <p>Models are sorted in the order they are added.</p>
     <p>( just like normal Javascript arrays )</p>
     <pre><code data-trim>
-library.add(song_one);
-library.add(song_two, {at: 0}); // insert at beginning
-library.add(song_three);
-library.pluck("title"); // ["song two", "song one", "song three"] 
+comments.add(samsComment);
+comments.add(tomsComment, {at: 0}); // insert at beginning
+comments.add(johnsComment);
+
+comments.pluck("content"); // ["Tom's Comment", "Sam's Comment", "John's Comment"] 
     </code></pre>
   </section>
 
@@ -101,12 +143,7 @@ library.pluck("title"); // ["song two", "song one", "song three"]
   <section>
     <h3 class="alt">get(id)</h3>
     <pre><code data-trim>
-// add some songs with ids to the dubstep playlist
-library.add({id: 55, artist: "Bassnectar", title: "Basscannon"});
-library.add({id: 67, artist: "Nero", title: "Guilt"});
-library.add({id: 14, artist: "Rusko", title: "Woo Boost"});
-
-library.get(14).get("title"); // "Woo Boost"
+comments.get(1).get("content"); // => "Hello World"
       </code></pre>
   </section>
 
@@ -114,12 +151,7 @@ library.get(14).get("title"); // "Woo Boost"
     <h3 class="alt">get(cid)</h3>
     <p>Cid (String "cX") is automatically assigned on model construction.<p>
     <pre><code data-trim>
-// add some songs without ids to the dubstep playlist
-library.add({artist: "Bassnectar", title: "Basscannon"}); // cid === "c0"
-library.add({artist: "Nero", title: "Guilt"});            // cid === "c1"
-library.add({artist: "Rusko", title: "Woo Boost"});       // cid === "c2"
-
-library.get("c1").get("title"); // "Guilt"
+comments.get("c1").get("title"); // => "Hello World"
     </code></pre>
   </section>
 
@@ -127,10 +159,7 @@ library.get("c1").get("title"); // "Guilt"
     <h3 class="alt">at(index)</h3>
     <p>Return model at index.<p>
     <pre><code data-trim>
-// add some songs without ids to the dubstep playlist
-library.add([song_one, song_two, song_three]);
-
-library.at(0); // song_one
+comments.at(0); // => "Hello World"
     </code></pre>
   </section>
 
@@ -138,12 +167,7 @@ library.at(0); // song_one
     <h3 class="alt">where(attributes)</h3>
     <p>Return models with matching attributes.<p>
     <pre><code data-trim>
-// add some songs to the dubstep playlist
-library.add({artist: "Bassnectar", title: "Basscannon"});
-library.add({artist: "Nero", title: "Guilt"});
-library.add({artist: "Nero", title: "Scorpions"});
-
-library.where({artist: "Nero"}).length; // 2
+comments.where({ email: "sam@quickleft" }) // => [ CommentModel ]
     </code></pre>
   </section>
 
@@ -151,12 +175,7 @@ library.where({artist: "Nero"}).length; // 2
     <h3 class="alt">pluck(attribute)</h3>
     <p>Retrieve an attribute value from each model.<p>
     <pre><code data-trim>
-// add some songs to the dubstep playlist
-library.add({artist: "Bassnectar", title: "Basscannon"});
-library.add({artist: "Nero", title: "Guilt"});
-library.add({artist: "Rusko", title: "Woo Boost"});
-
-library.pluck("title"); // ["Basscannon", "Guilt", "Woo Boost"]
+comments.pluck("content"); // ["Tom's Comment", "Sam's Comment", "John's Comment"] 
     </code></pre>
   </section>
 
@@ -173,20 +192,19 @@ library.pluck("title"); // ["Basscannon", "Guilt", "Woo Boost"]
     <h3 class="alt">url / fetch</h3>
     <p>Collection url property specifies RESTful endpoint.</p>
     <pre><code data-trim>
-// playlist definition
-var Playlist = Backbone.Collection.extend({
-  model: SongModel,
-  url: '/songs'
+var CommentsCollection = Backbone.Collection.extend({
+  model: CommentModel,
+  url: '/comments'
 });
 
-// create a single playlist
-var dubstep = new Playlist();
+var comments = new Playlist();
+comments.fetch(); // => GET /comments
 
-// fetch data from '/songs'
-dubstep.fetch(); // > Backbone.sync request to '/songs'
+comments.create( samsComment ); // POST /comments
+samsComment.set({ content: 'Goodbye Cruel World!' }); // PUT /comments/:id
+samsComment.destroy(); // DELETE /comments/:id
     </code></pre>
   </section>
-
 
 </section>
 
@@ -221,11 +239,10 @@ dubstep.fetch(); // > Backbone.sync request to '/songs'
   </section>
   <section>
     <h3 class="alt"><a href="http://api.jquery.com/category/deferred-object/">jQuery Deferreds</a></h3>
-    <p>always(), done(), fail(), notify(), notifyWith(), pipe(), progress(), promise(), reject(), rejectWith(), resolve(), resolveWith(), state(), then()</p>
     <p class="fragment">Common to chain Backbone methods with jQuery deferred objects</p>
     <pre class="fragment"><code data-trim>
-songCollection.fetch().then(function() {
-  songCollection.view.render();
+this.collection.fetch().then(function() {
+  this.render();
 });
       </code></pre>
   </section>
