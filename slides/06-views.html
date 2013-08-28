@@ -1,193 +1,101 @@
 <section>
   <section>
-    <h3 class="alt">Backbone Views and client side templating</h3>
-    <h5>A Backbone view is:</h5>
+    <h3 class="alt">Backbone Views</h3>
     <ul>
       <li class="fragment">
-        An object that manages the presentation of a model
+        An object that manages the presentation of a model or collection
       </li>
+      <li class="fragment">Associated with a DOM element</li>
       <li class="fragment">
         NOT just the HTML that gets rendered to the DOM.
       </li>
       <li class="fragment">
-        Manages events for its markup.
+        Manages DOM events for its element.
       </li>
     </ul>
   </section>
 
   <section>
-    <h3 class="alt">Backbone Views</h3>
-    <h5 class="fragment">Define a view</h5>
-    <pre class="fragment"><code data-trim>
-var SongView = Backbone.View.extend({
-  render: function() {
-    var template = _.template($('#song_template').html()),
-        markup = template(this.model.toJSON());
-
-    this.$el.html(markup).appendTo('#songs');
-  }
-});
-
-var song = new Song({artist: "Death Cab for Cutie", song: "Codes & Keys"});
-song.view = new songView({model: song});
-song.view.render();
-    </code></pre>
-  </section>
-  <section>
-    <h3 class="alt">Backbone Views</h3>
-    <h5 class="fragment">Templating</h5>
-    <ul>
-      <li class="fragment"><strong>Template:</strong> an HTML fragment that accepts a JavaScript object to fill in its missing data pieces</li>
-    </ul>
-    <pre class="fragment"><code data-trim>
-&lt;script type="html/template" id="song_template"&gt;
-  &lt;li class="song">
-    Title: <%= title %>
-    Artist: <%= artist %>
-  &lt;/li>
-&lt;/script&gt;
-    </code></pre>
-
-    <pre class="fragment"><code data-trim>
-var template = _.template($('#song_template').html());
-var song_object = {
-  title: "Codes & Keys",
-  artist: "Death Cab for Cutie"
-}
-var markup = template(song_object);
-    </code></pre>
-  </section>
-
-  <section>
-    <h3 class="alt">Backbone Views</h3>
-    <h5 class="fragment">Why use templates?</h5>
-    <pre class="fragment"><code data-trim>
-// warning: anti-pattern
-var li = "&lt;li class='song'>";
-li += "Title: Codes & Keys";
-li += "Artist: Death Cab for Cutie";
-li += "&lt;/li>"
-    </code></pre>
-
-    <pre class="fragment"><code data-trim>
-&lt;script type="html/template" id="song_template"&gt;
-  &lt;li class="song">
-    Title: <%= title %>
-    Artist: <%= artist %>
-  &lt;/li>
-&lt;/script&gt;
-    </code></pre>
-  </section>
-
-  <section>
-    <h3 class="alt">Backbone Views</h3>
-    <h5 class="fragment">Rendering</h5>
-    <pre class="fragment"><code data-trim>
-var SongView = Backbone.View.extend({
-  render: function() {
-    var template = _.template($('#song_template').html()),
-        markup = template(this.model.toJSON());
-
-    this.$el.html(markup).appendTo('#songs');
-  }
-});
-
-var song = new Song({artist: "Death Cab for Cutie", song: "Codes & Keys"});
-song.view = new songView({model: song});
-song.view.render();
-    </code></pre>
-  </section>
-
-  <section>
-    <h3 class="alt">Backbone Views</h3>
-    <h5 class="fragment">Rendering</h5>
-    <ul>
-      <li class="fragment">
-        A view has an associated HTML element at all times.
-      </li>
-      <li class="fragment">
-        Change the properties of that view by adding key/values to your view class. 
-      </li>
-    </ul>
-    <pre class="fragment"><code data-trim>
-var SongView = Backbone.View.extend({
+    <pre><code data-trim class="language-javascript">
+var CommentView = Backbone.View.extend({
   tagName: 'li',
-  className: 'song',
-  render: function() {}
-});
-    </code></pre>
-    <h5 class="fragment">Or use an element that's already there</h5>
-    <pre class="fragment"><code data-trim>
-var SongView = Backbone.View.extend({
-  el: $('#song_container'),
-  render: function() {}
+  template: commentTemplate,
+  initialize: function(){
+    if( !this.model ){
+      throw new Error('You must provide a Comment model');
+    }
+    this.listenTo( this.model, 'remove', this.remove);
+  },
+  render: function(){
+    this.$el.html( this.template( this ) );
+    return this.$el;
+  },
+  renderMarkdown: function(){
+    return markdown.toHTML( this.model.get('content') );
+  }
 });
     </code></pre>
   </section>
 
   <section>
-    <h3 class="alt">Backbone Views</h3>
-    <h5 class="fragment">DOM Events</h5>
-    <pre class="fragment"><code data-trim>
-var SongView = Backbone.View.extend({
+    <h3 class="alt">el / $el</h3>
+    <pre><code data-trim class="language-javascript">
+var CommentsApp = Backbone.View.extend({
+  el: $('.comments')
+});
+
+var CommentView = Backbone.View.extend({
+  tagName: 'li',
+  className: 'comment'
+});
+    </code></pre>
+    <pre class="fragment"><code data-trim class="language-javascript">
+this.el // => DOM node
+
+this.$el === $(this.el)
+this.$el.html("Hello World!");
+    </code></pre>
+  </section>
+
+
+  <section>
+    <h3 class="alt">Delegate Events</h3>
+    <pre class="fragment"><code data-trim class="language-javascript">
+var CommentsApp = Backbone.View.extend({
   events: {
-    'click li': 'playSong',
-    'submit #myForm': 'handleSubmit'
+    'submit form': 'createComment',
+    'click .logout': 'logout'
   },
-  render: function() {},
-  playSong: function(e) {
-    // handle the click event on an &lt;li> inside our view
+
+  createComment: function(event) {
+    ...
   },
-  handleSubmit: function(e) {
-    // handle the form submit event in an element with an ID of "myForm"
+
+  logout: function(event) {
+    ...
   }
 });
     </code></pre>
   </section>
 
   <section>
-    <h3 class="alt">Memory Management with Views</h3>
-    <ul>
-      <li class="fragment">GC is usually something you don't have to think about</li>
-      <li class="fragment">Views can be destroyed by calling <code>remove</code></li>
-      <li class="fragment">If views have references to long-lived objects, they
-        will remain in memory even after they are removed</li>
-    </ul>
+    <h3 class="alt">Event Bubbling</h3>
   </section>
 
   <section>
-    <pre ><code data-trim class="language-javascript">
-var SongView = Backbone.View.extend({
-  initialize: function(options){
-    this.model.on('change', this.render, this);
-  }
-});
-
-song.remove(); // Not garbage collected because of event binding
-    </code></pre>
-    <aside class="notes">
-      <p>In small apps with only a few views, this won't matter much
-      <p>But it will in large apps that do this 100s of times
-    </aside>
-  </section>
-
-  <section>
-    <pre ><code data-trim class="language-javascript">
-var SongView = Backbone.View.extend({
-  initialize: function(options){
-    this.listenTo(this.model, 'change', this.render, this);
-  }
-});
-
-song.remove(); // .stopListening() is called from .remove(), GC takes place
+    <h3 class="alt">Rendering</h3>
+    <pre class="fragment"><code data-trim class="language-javascript">
+render: function(){
+  this.$el.html( this.template( this ) );
+  return this.$el;
+}
     </code></pre>
   </section>
 
   <section>
     <h3 class="alt">Responsible Rendering</h3>
     <aside class="notes">
-      <p>The last thing to discuss is how to implement your render
-      methods
+      <p>Keep your render methods as lightweight as possible!
       <p>Granularity in rendering makes responding to changing needs in
       your application over time easier
       <p>Views are cheap to create; nesting views is totally acceptable
@@ -210,13 +118,89 @@ render: function(){
   </section>
 
   <section>
+    <h3 class="alt">Templating</h3>
+    <ul>
+      <li class="fragment"><strong>Template:</strong> an HTML fragment that accepts a JavaScript object to fill in its missing data pieces</li>
+    </ul>
+    <pre class="fragment"><code data-trim>
+&lt;script type="text/template" id="comment-template">
+  &lt;header>
+    Posted by &lt;span class="author-email">&lt;%= model.get("email") %>&lt;/span> &lt;span class="date">&lt;%= model.get("created_at") %>&lt;/span>
+  &lt;/header>
+  &lt;div class="comment-content">
+    &lt;%= renderMarkdown() %>
+  &lt;/div>
+&lt;/script>
+    </code></pre>
+
+    <pre class="fragment"><code data-trim>
+var commentTemplate = _.template( $('#comment-template').html() );
+
+commentTemplate( comment );
+    </code></pre>
+  </section>
+
+  <section>
+    <h3 class="alt">Why use templates?</h3>
+    <pre class="fragment"><code data-trim>
+// warning: anti-pattern
+var li = "&lt;li class='song'>";
+li += "Title: Codes & Keys";
+li += "Artist: Death Cab for Cutie";
+li += "&lt;/li>"
+    </code></pre>
+  </section>
+
+  <section>
+    <h3>Always precompile templates.</h3>
+  </section>
+
+  <section>
+    <h3 class="alt">Memory Management with Views</h3>
+    <ul>
+      <li class="fragment">GC is usually something you don't have to think about</li>
+      <li class="fragment">Views can be destroyed by calling <code>remove</code></li>
+      <li class="fragment">If views have references to long-lived objects, they
+        will remain in memory even after they are removed</li>
+    </ul>
+  </section>
+
+  <section>
+    <pre ><code data-trim class="language-javascript">
+var CommentView = Backbone.View.extend({
+  initialize: function(options){
+    this.model.on('change', this.render, this);
+  }
+});
+
+comment.remove(); // Not garbage collected because of event binding
+    </code></pre>
+    <aside class="notes">
+      <p>In small apps with only a few views, this won't matter much
+      <p>But it will in large apps that do this 100s of times
+    </aside>
+  </section>
+
+  <section>
+    <pre ><code data-trim class="language-javascript">
+var CommentView = Backbone.View.extend({
+  initialize: function(options){
+    this.listenTo(this.model, 'change', this.render, this);
+  }
+});
+
+comment.remove(); // .stopListening() is called from .remove(), GC takes place
+    </code></pre>
+  </section>
+
+
+  <section>
     <h3 class="alt">Organizing applications around a view</h3>
   </section>
 
   <section>
     <pre ><code data-trim class="language-javascript">
 var Comments = Backbone.View.extend({
-
   el: $('.comments'),
 
   initialize: function(){
